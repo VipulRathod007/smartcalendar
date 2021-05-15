@@ -1,0 +1,184 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>{{webData.tabTitle}} | {{subTitle}}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.3.0/mdb.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{% static 'css/style1.css'%}">
+
+    {% block style %}
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+
+        a {
+            color: black;
+        }
+    </style>
+    {% endblock style %}
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg text-white">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'App-Home' %}">{{webData.projectTitle}}</a>
+            <button style="color: white;" class="navbar-toggler" type="button" data-mdb-toggle="collapse"
+                data-mdb-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"><img src="{% static 'images/down-arrow.png' %}" alt=""></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor02">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item active">
+                        <a class="nav-link" aria-current="page" href="{% url 'App-Home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav d-flex flex-row">
+                    <!-- Icons -->
+                    <!-- <li class="nav-item me-3 me-lg-0">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-shopping-cart"></i>
+                        </a>
+                    </li> -->
+                    <!-- Icon dropdown -->
+                    <li class="nav-item me-3 me-lg-0 dropdown">
+                        <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button"
+                            data-mdb-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        <ul class="dropdown-menu ml-4" aria-labelledby="navbarDropdown">
+                            {% if request.session.user %}
+                            <li><a class="dropdown-item" href="{% url 'User-Logout' %}">Logout</a></li>
+                            {% else %}
+                            <li class="border-bottom"><a class="dropdown-item"
+                                    href="{% url 'User-Authentication' %}">Login</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="error container">
+        {% if messages %}
+        {% for message in messages %}
+            {% if message.level != 'INFO' %}
+            <div class="alert alert-primary alert-dismissible fade show row align-items-center" role="alert"
+                style=" position: fixed; top:10%;  width:80%; margin: 0 auto; z-index:500000;">
+                <div style="color: black;">
+                    {{message}}
+                </div>
+                <button type="button" class="btn-close"
+                    style="border: none; margin-left: 5px; margin-right: 0px; background-color: white;"
+                    onclick="this.parentElement.style.display='none';" data-bs-dismiss="alert" aria-label="Close"><b
+                        style="color: #242424;"></b></button>
+            </div>
+            {% endif %}
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    {% block body %}
+    {% endblock body %}
+
+
+    <footer class="bg-dark text-white">
+        <!-- Grid container -->
+        <div class="container p-4">
+            <!--Grid row-->
+            <div class="row">
+                <!--Grid column-->
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Footer Content</h5>
+
+                    <p>
+                        Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                        Iste atque ea quis molestias. Fugiat pariatur maxime quis
+                        culpa corporis vitae repudiandae aliquam voluptatem
+                        veniam, est atque cumque eum delectus sint!
+                    </p>
+                </div>
+                <!--Grid column-->
+
+                <!--Grid column-->
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Links</h5>
+
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="#!" class="text-white">Link 1</a>
+                        </li>
+                        <li>
+                            <a href="#!" class="text-white">Link 2</a>
+                        </li>
+                        <li>
+                            <a href="#!" class="text-white">Link 3</a>
+                        </li>
+                        <li>
+                            <a href="#!" class="text-white">Link 4</a>
+                        </li>
+                    </ul>
+                </div>
+                <!--Grid column-->
+
+                <!--Grid column-->
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Links</h5>
+
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="#!" class="text-white">Link 1</a>
+                        </li>
+                        <li>
+                            <a href="#!" class="text-white">Link 2</a>
+                        </li>
+                        <li>
+                            <a href="#!" class="text-white">Link 3</a>
+                        </li>
+                        <li>
+                            <a href="#!" class="text-white">Link 4</a>
+                        </li>
+                    </ul>
+                </div>
+                <!--Grid column-->
+            </div>
+            <!--Grid row-->
+        </div>
+        <!-- Grid container -->
+
+        <!-- Copyright -->
+        <div class="text-center p-3" style="
+            background-color: rgba(0, 0, 0, 0.2);
+            color: rgba(255, 255, 255, 0.6);
+            ">
+            © 2020 Copyright:
+            <a class="text-white" href="https://mdbootstrap.com/">
+                MDBootstrap.com</a>
+        </div>
+        <!-- Copyright -->
+    </footer>
+
+    {% block javascript %}
+    <script>
+    </script>
+    {% endblock javascript %}
+    <!-- MDB -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.3.0/mdb.min.js"></script>
+</body>
+
+</html>

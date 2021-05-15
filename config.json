@@ -1,0 +1,28 @@
+{
+  "content": {
+    "metadata": {
+      "alphaApp": "Calendar"
+    },
+    "urls": {
+      "home": "App-Home",
+      "authenticate": "User-Authentication",
+      "logout": "User-Logout"
+    },
+    "mappingUrls": {
+      "home": "",
+      "prefix": "home/",
+      "authenticate": "authenticate/",
+      "register": "authenticate/?authType=register",
+      "logout": "logout"
+    },
+    "redirectUrls": {
+      "home": "",
+      "authenticate": "authenticate/",
+      "register": "authenticate/?authType=register"
+    },
+    "webData": {
+      "tabTitle": "smartCalendar",
+      "projectTitle": "smartCalendar"
+    }
+  }
+}
