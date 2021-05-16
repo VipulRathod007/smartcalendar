@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
+from .models import *
 import json
 
 
@@ -23,6 +24,7 @@ def home(request):
     context['subTitle'] = "Home"
     transformUrl(context['urls'])
     if 'user' in request.session:
+        context['meetings'] = Meeting.objects.filter(userid=int(request.session['user']))
         return render(request, f"{context['metadata']['alphaApp']}/index.html", context=context)
     else:
         return redirect(f"/{context['mappingUrls']['prefix']}{context['mappingUrls']['authenticate']}")
@@ -56,6 +58,7 @@ def authenticate(request):
                     return redirect(f"/{context['mappingUrls']['prefix']}{context['mappingUrls']['authenticate']}")
                 else:
                     context['subTitle'] = "Home"
+                    request.session['user'] = User.objects.filter(email=emailAddr).first().id
                     return redirect(f"/{context['mappingUrls']['prefix']}")
             else:
                 emailAddr = request.POST['email']
@@ -66,9 +69,10 @@ def authenticate(request):
                 else:
                     userObj = User()
                     userObj.email = emailAddr
+                    userObj.username = emailAddr
                     userObj.password = passwd
-                    request.session['user'] = emailAddr
                     userObj.save()
+                    request.session['user'] = userObj.id
                     context['subTitle'] = "Home"
                     return redirect(f"/{context['mappingUrls']['prefix']}")
 
@@ -77,4 +81,123 @@ def logout(request):
     request.session['user'] = None
     request.session.pop('user')
     context['subTitle'] = "Home"
+    messages.info(request, 'Logged out successfully!')
     return redirect(f"/{context['mappingUrls']['prefix']}")
+
+
+# def updateEvent(request):
+#     if 'user' in request.session:
+#         if request.method == "POST":
+#             if 'meetID' in request.POST and 'event' in request.POST:
+#                 if request.POST['event'] == context['eventTypes']['Meeting']:
+#                     meetObj = Meeting.objects.filter(id=int(request.POST['meetID'])).first()
+#                     if meetObj.userid == int(request.session['user']):
+#                     else:
+#                         messages.warning(request, "Illegal Operation")
+#                         return redirect(f"/{context['mappingUrls']['prefix']}")
+#             else:
+#                 messages.warning(request, "Important Parameter missing!")
+#                 return redirect(f"/{context['mappingUrls']['prefix']}")
+#         else:
+#             return redirect(f"/{context['mappingUrls']['prefix']}")
+#     else:
+#         return redirect(f"/{context['mappingUrls']['prefix']}")
+
+
+def deleteEvent(request):
+    if 'user' in request.session:
+        if request.method == "GET":
+            if 'id' in request.GET and 'type' in request.GET:
+                if request.GET['type'] == context['eventTypes']['Meeting']:
+                    meetObj = Meeting.objects.filter(id=int(request.GET['id'])).first()
+                    if meetObj.userid == int(request.session['user']):
+                        Meeting.objects.filter(id=int(request.GET['id'])).first().delete()
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
+                    else:
+                        messages.warning(request, "Illegal Operation")
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
+            else:
+                messages.warning(request, "Important Parameter missing!")
+                return redirect(f"/{context['mappingUrls']['prefix']}")
+        else:
+            return redirect(f"/{context['mappingUrls']['prefix']}")
+    else:
+        return redirect(f"/{context['mappingUrls']['prefix']}")
+
+
+def showEvent(request):
+    context['subTitle'] = "Show"
+    if request.method == "GET":
+        if 'action' in request.GET or True:
+            if 'type' in request.GET and request.GET['type'] == context['eventTypes']['Meeting']:
+                if 'id' in request.GET:
+                    context['meetingDetails'] = Meeting.objects.filter(id=int(request.GET['id'])).first()
+                    context['meeting'] = True
+                    context['view'] = True
+                    return render(request, f"{context['metadata']['alphaApp']}/showEvent.html", context=context)
+                else:
+                    return redirect(f"/{context['mappingUrls']['prefix']}")
+            elif 'type' in request.GET and request.GET['type'] == context['eventTypes']['Task']:
+                pass
+    else:
+        return redirect(f"/{context['mappingUrls']['prefix']}")
+
+
+def add(request):
+    context['subTitle'] = "Add New"
+    if request.method == "GET":
+        if 'eventTypes' in request.GET:
+            if request.GET['eventTypes'] == context['eventTypes']['Meeting']:
+                context['meeting'] = True
+                return render(request, f"{context['metadata']['alphaApp']}/addnew.html", context=context)
+            else:
+                context['meeting'] = False
+                return render(request, f"{context['metadata']['alphaApp']}/addnew.html", context=context)
+        else:
+            return redirect(f"/{context['mappingUrls']['prefix']}")
+    elif request.method == "POST":
+        if 'event' in request.POST:
+            if request.POST['event'] == context['eventTypes']['Meeting']:
+                date = request.POST['date']
+                time = request.POST['time']
+                meetType = request.POST['meetType']
+                title = request.POST['title']
+                desc = request.POST['desc']
+                if 'meetID' in request.POST:
+                    meeting = Meeting.objects.filter(id=int(request.POST['meetID'])).first()
+                    if meeting.userid != int(request.session['user']):
+                        messages.warning(request, "Illegal Operation!")
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
+                else:
+                    meeting = Meeting()
+                if meetType == "0":
+                    messages.warning(request, "Invalid Meeting Type!")
+                    return redirect(f"/{context['mappingUrls']['prefix']}")
+                elif meetType == "1":
+                    meeting.meetType = "Virtual"
+                    meetUrl = request.POST['meetUrl']
+                    meeting.urlAddr = meetUrl
+                elif meetType == "2":
+                    meeting.meetType = "Visit"
+                    meetAddr = request.POST['meetAddr']
+                    meeting.meetAddr = meetAddr
+                meeting.title = title
+                meeting.date = date
+                meeting.time = time
+                meeting.description = desc
+                meeting.userid = int(request.session['user'])
+                if 'meetID' in request.POST:
+                    if meeting.meetType == 'Virtual':
+                        meeting.meetAddr = ''
+                    else:
+                        meeting.urlAddr = ''
+                    meeting.save()
+                    return redirect(f"/{context['mappingUrls']['prefix']}{context['mappingUrls']['show']}?type={context['eventTypes']['Meeting']}&id={meeting.id}")
+                else:
+                    meeting.save()
+                    return redirect(f"/{context['mappingUrls']['prefix']}")
+            elif request.POST['event'] == context['eventTypes']['Task']:
+                pass
+        else:
+            messages.warning(request, "Invalid Operation!")
+            return redirect(f"/{context['mappingUrls']['prefix']}")

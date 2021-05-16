@@ -1,0 +1,200 @@
+{% extends 'Calendar/base.html' %}
+{% load static %}
+{% block style %}
+<!-- <link rel="stylesheet" href="{% static 'css/auth.css' %}"> -->
+{% endblock style %}
+
+{% block body %}
+<div class="container">
+    {% if meeting %}
+    <div class="pb-4 pt-2 d-block mx-auto">
+        <div class="card mb-4 mt-3">
+            <div class="card-body px-4 mb-2">
+                <form method="POST" action="{% url 'Add-New' %}">
+                    {% csrf_token %}
+                    <h3>Meeting Details</h3>
+                    <hr>
+                    <input type="text" name="event" value="Meeting" hidden>
+                    <input type="text" name="meetID" value="{{meetingDetails.id}}" hidden>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <label for="date" class="form-label">Date</label>
+                            {% if view %}
+                            <input type="date" id="date" name="date" class="form-control" placeholder="First name"
+                                aria-label="First name" value="{{meetingDetails.date}}">
+                            {% else %}
+                            <input type="date" id="date" name="date" class="form-control" placeholder="First name"
+                                aria-label="First name" required>
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            <label for="time" class="form-label">Time</label>
+                            {% if view %}
+                            <input type="time" id="time" name="time" class="form-control" placeholder="Last name"
+                                aria-label="Last name" value="{{meetingDetails.time}}">
+                            {% else %}
+                            <input type="time" id="time" name="time" class="form-control" placeholder="Last name"
+                                aria-label="Last name" required>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        {% if view %}
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Meeting title"
+                            value="{{meetingDetails.title}}">
+                        {% else %}
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Meeting title"
+                            required>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="mb-2">
+                        <label for="inputAddress" class="form-label">Meeting Type</label>
+                        <select class="form-select" id="meetType" name="meetType" onchange="toggleMeetType();" required>
+                            <option value="0">
+                                --- Select ---</option>
+                            {% if meetingDetails.meetType == 'Virtual' %}
+                            <option value="1" selected>
+                                Virtual</option>
+                            <option value="2">
+                                Visit</option>
+                            {% else %}
+                            <option value="1">
+                                Virtual</option>
+                            <option value="2" selected>
+                                Visit</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div id="url" hidden>
+                        <label for="inputUrl" class="form-label">Meeting URL</label>
+                        {% if meetingDetails.urlAddr != "" %}
+                        <div class="row align-items-center">
+                            <div class="col-md-10 col-sm-9 col-xl-10">
+                                <input type="url" class="form-control" id="inputUrl" name="meetUrl"
+                                    placeholder="Meeting URL" value="{{meetingDetails.urlAddr}}">
+                            </div>
+                            <div class="col-md-2 col-sm-3 col-xl-2">
+                                <a href="{{meetingDetails.urlAddr}}" target="_blank"
+                                    class="btn btn-primary btn-sm">Launch</a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <input type="url" class="form-control" id="inputUrl" name="meetUrl" placeholder="Meeting URL">
+                        {% endif %}
+                    </div>
+
+                    <div id="addr" hidden>
+                        <label for="inputAddress" class="form-label">Meeting Address</label>
+                        {% if meetingDetails.meetAddr != "" %}
+                        <input type="text" class="form-control" id="inputAddress" name="meetAddr"
+                            placeholder="Meeting Place Address" value="{{meetingDetails.meetAddr}}">
+                        {% else %}
+                        <input type="text" class="form-control" id="inputAddress" name="meetAddr"
+                            placeholder="Meeting Place Address">
+                        {% endif %}
+                    </div>
+
+                    <div class="input-group mt-4">
+                        <span class="input-group-text">Description</span>
+                        {% if view %}
+                        <textarea class="form-control" aria-label="With textarea" name="desc" rows="2"
+                            required>{{meetingDetails.description}}</textarea>
+                        {% else %}
+                        <textarea class="form-control" aria-label="With textarea" name="desc" rows="2"
+                            required></textarea>
+                        {% endif %}
+                    </div>
+                    <hr>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a type="submit" class="btn btn-danger mt-3"
+                        href="{% url 'Event-Delete' %}?type={{eventTypes.Meeting}}&id={{meetingDetails.id}}">Delete</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="pb-4 pt-2 d-block mx-auto">
+        <div class="card mb-4 mt-3">
+            <div class="card-body px-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <h3>Add New Task</h3>
+                    <hr>
+                    <input type="text" name="event" value="Task" hidden>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <label for="date" class="form-label">Deadline Date</label>
+                            <input type="date" id="date" name="date" class="form-control" placeholder="First name"
+                                aria-label="First name" required>
+                        </div>
+                        <div class="col">
+                            <label for="time" class="form-label">Deadline Time</label>
+                            <input type="time" id="time" name="time" class="form-control" placeholder="Last name"
+                                aria-label="Last name" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="inputAddress" class="form-label">Task Group</label>
+                        <select class="form-select" id="taskGrp" required onchange="toggleTaskGroup();">
+                            <option value="0" selected>Independent</option>
+                            <option value="1">Add New</option>
+                            {% for taskName in taskGroup %}
+                            <option value="{{taskName}}">{{taskName}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3" id="taskgrp" hidden>
+                        <label for="task" class="form-label">Task Group Title</label>
+                        <input type="text" class="form-control" id="grpTitle" placeholder="Task Group title">
+                    </div>
+                    <div class="mb-3">
+                        <label for="task" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="task" placeholder="Task title" required>
+                    </div>
+                    <div class="input-group mt-4">
+                        <span class="input-group-text">Task Description</span>
+                        <textarea class="form-control" aria-label="With textarea" name="desc" rows="2"
+                            required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock body %}
+
+{% block javascript %}
+<script>
+    window.onload = toggleMeetType;
+    function toggleMeetType() {
+        if (document.getElementById("meetType").value == 1) {
+            document.getElementById("url").hidden = false;
+            document.getElementById("addr").hidden = true;
+        } else if (document.getElementById("meetType").value == 2) {
+            document.getElementById("addr").hidden = false;
+            document.getElementById("url").hidden = true;
+        }
+        else {
+            document.getElementById("addr").hidden = true;
+            document.getElementById("url").hidden = true;
+        }
+    }
+    function toggleTaskGroup() {
+        if (document.getElementById('taskGrp').value == 1) {
+            document.getElementById('taskgrp').hidden = false;
+        }
+        else {
+            document.getElementById('taskgrp').hidden = true;
+        }
+    }
+</script>
+{% endblock javascript %}

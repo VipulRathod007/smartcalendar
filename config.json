@@ -6,14 +6,22 @@
     "urls": {
       "home": "App-Home",
       "authenticate": "User-Authentication",
-      "logout": "User-Logout"
+      "logout": "User-Logout",
+      "add": "Add-New",
+      "update": "Event-Update",
+      "show": "Show-Event",
+      "delete": "Event-Delete"
     },
     "mappingUrls": {
       "home": "",
       "prefix": "home/",
       "authenticate": "authenticate/",
       "register": "authenticate/?authType=register",
-      "logout": "logout"
+      "logout": "logout",
+      "add": "addnew",
+      "update": "update",
+      "delete": "delete",
+      "show": "show"
     },
     "redirectUrls": {
       "home": "",
@@ -22,7 +30,18 @@
     },
     "webData": {
       "tabTitle": "smartCalendar",
-      "projectTitle": "smartCalendar"
+      "projectTitle": "smartCalendar",
+      "footer": " has been developed using Python, Django web framework and SQLite3 database. It is a responsive web application operated through Web browser."
+    },
+    "connect": {
+      "linkedin": "https://www.linkedin.com/in/vipulrathod7/",
+      "github": "https://github.com/VipulRathod007",
+      "mail": "vipuldrathod1458@gmail.com",
+      "youtube": ""
+    },
+    "eventTypes": {
+      "Meeting": "Meeting",
+      "Task": "Task"
     }
   }
 }

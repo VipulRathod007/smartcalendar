@@ -1,9 +1,88 @@
 {% extends 'Calendar/base.html' %}
 {% load static %}
+
+{% block style %}
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+    crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"
+    integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk=" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css"
+    href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+
+<!-- jQuery -->
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js"></script>
+
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8"
+    src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+{% endblock style %}
 {% block body %}
 
-<div class="container">
-    <h1>Hello World!</h1>
+<div class="container mt-3" style="min-height: 100vh;">
+    <div class="row align-items-center">
+        <div class="col-md-11 col-sm-9 col-xl-11">
+            <h1>Your Events</h1>
+        </div>
+        <div class="col-md-1 col-sm-3 col-xl-1">
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <div class="btn-group" role="group">
+                    <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary dropdown-toggle"
+                        data-mdb-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-plus"></i> New
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        {% for item in eventTypes %}
+                        <li>
+                            <a class="dropdown-item border-bottom"
+                                href="{% url 'Add-New' %}?eventTypes={{item}}">{{item}}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    {% if meetings %}
+    <div class="container mt-3">
+        <table class="table table-hover" id="upcoming">
+            <thead>
+                <tr>
+                    <th scope="col">Meeting Time</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for meet in meetings %}
+                <tr>
+                    <td scope="row">{{meet.date}} {{meet.time}}</td>
+                    <td>{{meet.title}}</td>
+                    <td>
+                        <a href="{% url 'Show-Event' %}?type={{eventTypes.Meeting}}&id={{meet.id}}"
+                            class="btn bg-white"><i class="fa fa-eye"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center text-muted">No Events added yet!</p>
+    {% endif %}
 </div>
 
+
 {% endblock body %}
+
+{% block javascript %}
+<script>
+    $('#upcoming').DataTable();
+</script>
+{% endblock javascript %}

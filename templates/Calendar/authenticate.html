@@ -1,121 +1,126 @@
 {% extends 'Calendar/base.html' %}
 {% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock style %}
 {% block body %}
 
-<div class="container">
-    <div class="col-sd-6 col-md-6 mb-4 mt-4 d-block mx-auto">
-        <div class="card mb-4 mt-3">
-            <div class="card-body px-4">
-                <form method="POST">
-                    {% if login %}
-                    <h3>Sign In</h3>
-                    <input type="text" name="authType" value="login" hidden>
-                    {% else %}
-                    <h3>Register</h3>
-                    <input type="text" name="authType" value="register" hidden>
-                    {% endif %}
+<div id="bg">
+    <div class="container">
+        <div class="col-sd-6 col-md-6 pb-4 pt-4 d-block mx-auto">
+            <div class="card mb-4 mt-3">
+                <div class="card-body px-4">
+                    <form method="POST">
+                        {% if login %}
+                        <h3>Sign In</h3>
+                        <input type="text" name="authType" value="login" hidden>
+                        {% else %}
+                        <h3>Register</h3>
+                        <input type="text" name="authType" value="register" hidden>
+                        {% endif %}
 
-                    <hr>
-                    
-                    {% csrf_token %}
-                    <!-- Email input -->
-                    <div class="form-outline mb-4">
-                        <input type="email" id="form2Example1" class="form-control" name="email" style="
+                        <hr>
+
+                        {% csrf_token %}
+                        <!-- Email input -->
+                        <div class="form-outline mb-4">
+                            <input type="email" id="form2Example1" class="form-control" name="email" style="
                         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAAAXNSR0IArs4c6QAAAUBJREFUOBGVVE2ORUAQLvIS4gwzEysHkHgnkMiEc4zEJXCMNwtWTmDh3UGcYoaFhZUFCzFVnu4wIaiE+vvq6+6qTgthGH6O4/jA7x1OiCAIPwj7CoLgSXDxSjEVzAt9k01CBKdWfsFf/2WNuEwc2YqigKZpK9glAlVVwTTNbQJZlnlCkiTAZnF/mePB2biRdhwHdF2HJEmgaRrwPA+qqoI4jle5/8XkXzrCFoHg+/5ICdpm13UTho7Q9/0WnsfwiL/ouHwHrJgQR8WEwVG+oXpMPaDAkdzvd7AsC8qyhCiKJjiRnCKwbRsMw9hcQ5zv9maSBeu6hjRNYRgGFuKaCNwjkjzPoSiK1d1gDDecQobOBwswzabD/D3Np7AHOIrvNpHmPI+Kc2RZBm3bcp8wuwSIot7QQ0PznoR6wYSK0Xb/AGVLcWwc7Ng3AAAAAElFTkSuQmCC');
                         background-repeat: no-repeat;
                         background-attachment: scroll;
                         background-size: 16px 18px;
                         background-position: 98% 50%;
                         " required />
-                        <label class="form-label" for="form2Example1" style="margin-left: 0px">Email
-                            address</label>
+                            <label class="form-label" for="form2Example1" style="margin-left: 0px">Email
+                                address</label>
 
-                        <div class="form-notch">
-                            <div class="form-notch-leading" style="width: 9px"></div>
-                            <div class="form-notch-middle" style="width: 88.8px"></div>
-                            <div class="form-notch-trailing"></div>
+                            <div class="form-notch">
+                                <div class="form-notch-leading" style="width: 9px"></div>
+                                <div class="form-notch-middle" style="width: 88.8px"></div>
+                                <div class="form-notch-trailing"></div>
+                            </div>
                         </div>
-                    </div>
-                    {% if not login %}
-                    <div class="toast fade show bg-primary text-white w-100 mb-4" role="alert" aria-live="assertive"
-                        aria-atomic="true">
-                        <div class="toast-header bg-primary text-white">
-                            <small>
-                                <i class="fas fa-check fa-sm me-2"></i>
-                                <strong class="me-auto">Notice</strong>
-                            </small>
+                        {% if not login %}
+                        <div class="toast fade show bg-primary text-white w-100 mb-4" role="alert" aria-live="assertive"
+                            aria-atomic="true">
+                            <div class="toast-header bg-primary text-white">
+                                <small>
+                                    <i class="fas fa-check fa-sm me-2"></i>
+                                    <strong class="me-auto">Notice</strong>
+                                </small>
+                            </div>
+                            <div class="toast-body">
+                                We'll never share your email with anyone else.
+                            </div>
                         </div>
-                        <div class="toast-body">
-                            We'll never share your email with anyone else.
-                        </div>
-                    </div>
-                    {% endif %}
+                        {% endif %}
 
-                    <!-- Password input -->
-                    <div class="form-outline mb-4">
-                        {% if login %}
-                        <input type="password" id="form2Example2" class="form-control" name="password"
-                            autocomplete="off" style="
+                        <!-- Password input -->
+                        <div class="form-outline mb-4">
+                            {% if login %}
+                            <input type="password" id="form2Example2" class="form-control" name="password"
+                                autocomplete="off" style="
                         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAAAXNSR0IArs4c6QAAAUBJREFUOBGVVE2ORUAQLvIS4gwzEysHkHgnkMiEc4zEJXCMNwtWTmDh3UGcYoaFhZUFCzFVnu4wIaiE+vvq6+6qTgthGH6O4/jA7x1OiCAIPwj7CoLgSXDxSjEVzAt9k01CBKdWfsFf/2WNuEwc2YqigKZpK9glAlVVwTTNbQJZlnlCkiTAZnF/mePB2biRdhwHdF2HJEmgaRrwPA+qqoI4jle5/8XkXzrCFoHg+/5ICdpm13UTho7Q9/0WnsfwiL/ouHwHrJgQR8WEwVG+oXpMPaDAkdzvd7AsC8qyhCiKJjiRnCKwbRsMw9hcQ5zv9maSBeu6hjRNYRgGFuKaCNwjkjzPoSiK1d1gDDecQobOBwswzabD/D3Np7AHOIrvNpHmPI+Kc2RZBm3bcp8wuwSIot7QQ0PznoR6wYSK0Xb/AGVLcWwc7Ng3AAAAAElFTkSuQmCC');
                         background-repeat: no-repeat;
                         background-attachment: scroll;
                         background-size: 16px 18px;
                         background-position: 98% 50%;
                         " />
-                        {% else %}
-                        <input type="password" id="form2Example2" class="form-control" name="password"
-                            autocomplete="off" placeholder="Choose a strong password" style="
+                            {% else %}
+                            <input type="password" id="form2Example2" class="form-control" name="password"
+                                autocomplete="off" placeholder="Choose a strong password" style="
                         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAAAXNSR0IArs4c6QAAAUBJREFUOBGVVE2ORUAQLvIS4gwzEysHkHgnkMiEc4zEJXCMNwtWTmDh3UGcYoaFhZUFCzFVnu4wIaiE+vvq6+6qTgthGH6O4/jA7x1OiCAIPwj7CoLgSXDxSjEVzAt9k01CBKdWfsFf/2WNuEwc2YqigKZpK9glAlVVwTTNbQJZlnlCkiTAZnF/mePB2biRdhwHdF2HJEmgaRrwPA+qqoI4jle5/8XkXzrCFoHg+/5ICdpm13UTho7Q9/0WnsfwiL/ouHwHrJgQR8WEwVG+oXpMPaDAkdzvd7AsC8qyhCiKJjiRnCKwbRsMw9hcQ5zv9maSBeu6hjRNYRgGFuKaCNwjkjzPoSiK1d1gDDecQobOBwswzabD/D3Np7AHOIrvNpHmPI+Kc2RZBm3bcp8wuwSIot7QQ0PznoR6wYSK0Xb/AGVLcWwc7Ng3AAAAAElFTkSuQmCC');
                         background-repeat: no-repeat;
                         background-attachment: scroll;
                         background-size: 16px 18px;
                         background-position: 98% 50%;
                         " />
+                            {% endif %}
+
+                            <label class="form-label" for="form2Example2" style="margin-left: 0px">Password</label>
+                            <div class="form-notch">
+                                <div class="form-notch-leading" style="width: 9px"></div>
+                                <div class="form-notch-middle" style="width: 64px"></div>
+                                <div class="form-notch-trailing"></div>
+                            </div>
+                        </div>
+
+                        {% if not login %}
+                        <div class="toast fade show bg-primary text-white w-100 mb-4" role="alert" aria-live="assertive"
+                            aria-atomic="true">
+                            <div class="toast-header bg-primary text-white">
+                                <small>
+                                    <i class="fas fa-check fa-sm me-2"></i>
+                                    <strong class="me-auto">Suggestion</strong>
+                                </small>
+                            </div>
+                            <div class="toast-body">
+                                Your password must be 8-20 characters long, contain letters and numbers, and must
+                                not contain
+                                spaces,
+                                special characters, or emoji.
+                            </div>
+                        </div>
                         {% endif %}
 
-                        <label class="form-label" for="form2Example2" style="margin-left: 0px">Password</label>
-                        <div class="form-notch">
-                            <div class="form-notch-leading" style="width: 9px"></div>
-                            <div class="form-notch-middle" style="width: 64px"></div>
-                            <div class="form-notch-trailing"></div>
-                        </div>
-                    </div>
+                        <!-- Submit button -->
+                        <button type="submit" class="btn btn-primary mb-4 d-block mx-auto">
+                            {% if login %}
+                            <span>Sign in</span>
+                            {% else %}
+                            <span>Register</span>
+                            {% endif %}
+                        </button>
 
-                    {% if not login %}
-                    <div class="toast fade show bg-primary text-white w-100 mb-4" role="alert" aria-live="assertive"
-                        aria-atomic="true">
-                        <div class="toast-header bg-primary text-white">
-                            <small>
-                                <i class="fas fa-check fa-sm me-2"></i>
-                                <strong class="me-auto">Suggestion</strong>
-                            </small>
-                        </div>
-                        <div class="toast-body">
-                            Your password must be 8-20 characters long, contain letters and numbers, and must
-                            not contain
-                            spaces,
-                            special characters, or emoji.
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <!-- Submit button -->
-                    <button type="submit" class="btn btn-primary mb-4 d-block mx-auto">
                         {% if login %}
-                        <span>Sign in</span>
-                        {% else %}
-                        <span>Register</span>
+                        <!-- Register buttons -->
+                        <div class="text-center">
+                            <p>Haven't Registered with us? <a
+                                    href="{% url 'User-Authentication' %}?authType=register">Register</a></p>
+                        </div>
                         {% endif %}
-                    </button>
-
-                    {% if login %}
-                    <!-- Register buttons -->
-                    <div class="text-center">
-                        <p>Haven't Registered with us? <a
-                                href="{% url 'User-Authentication' %}?authType=register">Register</a></p>
-                    </div>
-                    {% endif %}
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
