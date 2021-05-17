@@ -37,12 +37,12 @@
                         <i class="fa fa-plus"></i> New
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                        {% for item in eventTypes %}
+                       
                         <li>
                             <a class="dropdown-item border-bottom"
-                                href="{% url 'Add-New' %}?eventTypes={{item}}">{{item}}</a>
+                                href="{% url 'Add-New' %}?eventTypes=Meeting">Meeting</a>
                         </li>
-                        {% endfor %}
+                        
                     </ul>
                 </div>
             </div>
