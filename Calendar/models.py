@@ -9,6 +9,8 @@ class Meeting(models.Model):
     title = models.CharField(max_length=50, default="")
     meetType = models.CharField(max_length=25, default="")
     description = models.CharField(max_length=1000, default="")
+    meetingNotes = models.CharField(max_length=2000, default="")
+    refMeet = models.IntegerField(default=0)
     userid = models.IntegerField()
 
     def __str__(self):

@@ -51,6 +51,8 @@
     <hr>
     {% if meetings %}
     <div class="container mt-3">
+        <h2>{{eventTypes.Meeting}}</h2>
+        <br>
         <table class="table table-hover" id="upcoming">
             <thead>
                 <tr>
@@ -67,6 +69,8 @@
                     <td>
                         <a href="{% url 'Show-Event' %}?type={{eventTypes.Meeting}}&id={{meet.id}}"
                             class="btn bg-white"><i class="fa fa-eye"></i></a>
+                        <a href="{% url 'Event-Delete' %}?type={{eventTypes.Meeting}}&id={{meet.id}}"
+                            class="btn bg-danger"><i class="fa fa-trash text-white"></i></a>
                     </td>
                 </tr>
                 {% endfor %}

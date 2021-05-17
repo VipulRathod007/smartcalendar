@@ -6,7 +6,7 @@
 
 {% block body %}
 <div class="container">
-    {% if meeting %}
+    {% if meeting and meetingDetails %}
     <div class="pb-4 pt-2 d-block mx-auto">
         <div class="card mb-4 mt-3">
             <div class="card-body px-4 mb-2">
@@ -50,6 +50,43 @@
                         {% endif %}
                     </div>
 
+                    {% if meetings %}
+                    <div class="mb-2">
+                        <label for="meetRef" class="form-label">Meeting Reference</label>
+                        {% if view %}
+                        <div class="row align-items-center">
+                            <div class="col-md-10 col-sm-9 col-xl-10">
+                                <select class="form-select" id="meetRef" name="meetRef">
+                                    <option value="-1">
+                                        --- Select ---</option>
+                                    <option value="0">
+                                        Independent Meeting</option>
+                                    {% for meet in meetings %}
+                                    {% if meet.id == meetingDetails.refMeet %}
+                                    <option value="{{meet.id}}" selected><span class="bg-primary">{{meet.title}} on
+                                            {{meet.date}} {{meet.time}} &check;</span></option>
+                                    {% else %}
+                                    <option value="{{meet.id}}">{{meet.title}} on {{meet.date}} {{meet.time}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2 col-sm-3 col-xl-2">
+                                <a href="{% url 'Show-Event' %}?type={{eventTypes.Meeting}}&id={{meetingDetails.refMeet}}"
+                                    target="_blank" class="btn btn-primary btn-sm">Show</a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <select class="form-select" id="meetRef" name="meetRef">
+                            <option value="0">
+                                --- Select ---</option>
+                            {% for meet in meetings %}
+                            <option value="{{meet.id}}">{{meet.title}} on {{meet.date}} {{meet.time}}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                    </div>
+                    {% endif %}
 
                     <div class="mb-2">
                         <label for="inputAddress" class="form-label">Meeting Type</label>
@@ -70,7 +107,7 @@
                         </select>
                     </div>
 
-                    <div id="url" hidden>
+                    <div class="mt-2" id="url" hidden>
                         <label for="inputUrl" class="form-label">Meeting URL</label>
                         {% if meetingDetails.urlAddr != "" %}
                         <div class="row align-items-center">
@@ -88,7 +125,7 @@
                         {% endif %}
                     </div>
 
-                    <div id="addr" hidden>
+                    <div class="mt-2" id="addr" hidden>
                         <label for="inputAddress" class="form-label">Meeting Address</label>
                         {% if meetingDetails.meetAddr != "" %}
                         <input type="text" class="form-control" id="inputAddress" name="meetAddr"

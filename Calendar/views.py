@@ -112,6 +112,7 @@ def deleteEvent(request):
                     meetObj = Meeting.objects.filter(id=int(request.GET['id'])).first()
                     if meetObj.userid == int(request.session['user']):
                         Meeting.objects.filter(id=int(request.GET['id'])).first().delete()
+                        messages.success(request, f"Meeting deleted successfully!")
                         return redirect(f"/{context['mappingUrls']['prefix']}")
                     else:
                         messages.warning(request, "Illegal Operation")
@@ -131,7 +132,19 @@ def showEvent(request):
         if 'action' in request.GET or True:
             if 'type' in request.GET and request.GET['type'] == context['eventTypes']['Meeting']:
                 if 'id' in request.GET:
-                    context['meetingDetails'] = Meeting.objects.filter(id=int(request.GET['id'])).first()
+                    context['allMeetings'] = Meeting.objects.filter(userid=int(request.session['user']))
+                    flag = False
+                    context['meetings'] = list()
+                    for meet in context['allMeetings']:
+                        if meet.id == int(request.GET['id']):
+                            flag = True
+                            context['meetingDetails'] = meet
+                        else:
+                            context['meetings'].append(meet)
+                    if not flag:
+                        context['meetingDetails'] = False
+                        messages.warning(request, "Requested Meeting not found!")
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
                     context['meeting'] = True
                     context['view'] = True
                     return render(request, f"{context['metadata']['alphaApp']}/showEvent.html", context=context)
@@ -149,6 +162,7 @@ def add(request):
         if 'eventTypes' in request.GET:
             if request.GET['eventTypes'] == context['eventTypes']['Meeting']:
                 context['meeting'] = True
+                context['meetings'] = Meeting.objects.filter(userid=int(request.session['user']))
                 return render(request, f"{context['metadata']['alphaApp']}/addnew.html", context=context)
             else:
                 context['meeting'] = False
@@ -181,6 +195,14 @@ def add(request):
                     meeting.meetType = "Visit"
                     meetAddr = request.POST['meetAddr']
                     meeting.meetAddr = meetAddr
+                if 'meetRef' in request.POST:
+                    if request.POST['meetRef'] == '-1':
+                        messages.warning(request, "Invalid Meeting Selected!")
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
+                    else:
+                        meeting.refMeet = int(request.POST['meetRef'])
+                else:
+                    meeting.refMeet = 0
                 meeting.title = title
                 meeting.date = date
                 meeting.time = time
@@ -192,9 +214,11 @@ def add(request):
                     else:
                         meeting.urlAddr = ''
                     meeting.save()
+                    messages.success(request, f"{meeting.title} updated successfully!")
                     return redirect(f"/{context['mappingUrls']['prefix']}{context['mappingUrls']['show']}?type={context['eventTypes']['Meeting']}&id={meeting.id}")
                 else:
                     meeting.save()
+                    messages.success(request, f"New meeting {meeting.title} added successfully!")
                     return redirect(f"/{context['mappingUrls']['prefix']}")
             elif request.POST['event'] == context['eventTypes']['Task']:
                 pass
