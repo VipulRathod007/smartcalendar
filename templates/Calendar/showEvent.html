@@ -12,7 +12,7 @@
             <div class="card-body px-4 mb-2">
                 <form method="POST" action="{% url 'Add-New' %}">
                     {% csrf_token %}
-                    <h3>Meeting Details</h3>
+                    <h3>{{eventTypes.Meeting}} Details</h3>
                     <hr>
                     <input type="text" name="event" value="Meeting" hidden>
                     <input type="text" name="meetID" value="{{meetingDetails.id}}" hidden>
@@ -59,8 +59,13 @@
                                 <select class="form-select" id="meetRef" name="meetRef">
                                     <option value="-1">
                                         --- Select ---</option>
+                                    {% if meetingDetails.refMeet == 0 %}
+                                    <option value="0" selected>
+                                        Independent Meeting &check;</option>
+                                    {% else %}
                                     <option value="0">
                                         Independent Meeting</option>
+                                    {% endif %}
                                     {% for meet in meetings %}
                                     {% if meet.id == meetingDetails.refMeet %}
                                     <option value="{{meet.id}}" selected><span class="bg-primary">{{meet.title}} on
@@ -146,6 +151,36 @@
                             required></textarea>
                         {% endif %}
                     </div>
+
+                    {% if meetingDetails.meetingNotes == "" %}
+                    <div class="mt-3">
+                        <div id="commentBtn">
+                            <button type="button" onclick="toggleComment();"
+                                style="flex-direction: row; align-items: flex-end;" class="btn btn-primary btn-sm"><i
+                                    class="fa fa-plus"></i> New Comment</button>
+                        </div>
+                        <div id="commentCloseBtn" hidden>
+                            <button type="button" onclick="toggleComment();" class="btn btn-danger btn-close"></button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if meetingDetails.meetingNotes != "" %}
+                    <div class="form-floating mt-4">
+                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"
+                            name="meetNote">{{meetingDetails.meetingNotes}}</textarea>
+                        <label for="floatingTextarea">Comments</label>
+                    </div>
+                    {% endif %}
+
+                    {% if meetingDetails.meetingNotes == "" %}
+                    <div class="form-floating mt-4" id="comment" hidden>
+                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"
+                            name="meetNote"></textarea>
+                        <label for="floatingTextarea">Comments</label>
+                    </div>
+                    {% endif %}
+
                     <hr>
                     <button type="submit" class="btn btn-primary">Update</button>
                     <a type="submit" class="btn btn-danger mt-3"
@@ -158,48 +193,153 @@
     <div class="pb-4 pt-2 d-block mx-auto">
         <div class="card mb-4 mt-3">
             <div class="card-body px-4">
-                <form method="POST">
+                <form method="POST" action="{% url 'Add-New' %}">
                     {% csrf_token %}
-                    <h3>Add New Task</h3>
+                    <h3>{{eventTypes.Task}} Details</h3>
                     <hr>
                     <input type="text" name="event" value="Task" hidden>
+                    <input type="text" name="taskID" value="{{taskDetails.id}}" hidden>
                     <div class="row mb-2">
                         <div class="col">
                             <label for="date" class="form-label">Deadline Date</label>
+                            {% if view %}
+                            <input type="date" id="date" name="date" class="form-control" placeholder="First name"
+                                aria-label="First name" value="{{taskDetails.date}}">
+                            {% else %}
                             <input type="date" id="date" name="date" class="form-control" placeholder="First name"
                                 aria-label="First name" required>
+                            {% endif %}
                         </div>
                         <div class="col">
                             <label for="time" class="form-label">Deadline Time</label>
+                            {% if view %}
+                            <input type="time" id="time" name="time" class="form-control" placeholder="Last name"
+                                aria-label="Last name" value="{{taskDetails.time}}">
+                            {% else %}
                             <input type="time" id="time" name="time" class="form-control" placeholder="Last name"
                                 aria-label="Last name" required>
+                            {% endif %}
                         </div>
                     </div>
 
                     <div class="mb-2">
-                        <label for="inputAddress" class="form-label">Task Group</label>
-                        <select class="form-select" id="taskGrp" required onchange="toggleTaskGroup();">
-                            <option value="0" selected>Independent</option>
-                            <option value="1">Add New</option>
-                            {% for taskName in taskGroup %}
-                            <option value="{{taskName}}">{{taskName}}</option>
+                        <label for="taskGrp" class="form-label">Task Group</label>
+                        <select class="form-select" id="taskGrp" name="taskGrp" required onchange="toggleTaskGroup();">
+                            {% if taskDetails.taskGroup == "" %}
+                            <option value="-1" selected>Independent &check;</option>
+                            {% else %}
+                            <option value="-1">Independent</option>
+                            {% endif %}
+                            <option value="0">Add New</option>
+                            {% for taskTitle in taskGroupTitle %}
+                                {% if taskDetails.taskGroup == taskTitle %}
+                                <option value="{{taskTitle}}" selected>{{taskTitle}} &check;</option>
+                                {% else %}
+                                <option value="{{taskTitle}}">{{taskTitle}}</option>
+                                {% endif %}
                             {% endfor %}
                         </select>
                     </div>
                     <div class="mb-3" id="taskgrp" hidden>
-                        <label for="task" class="form-label">Task Group Title</label>
-                        <input type="text" class="form-control" id="grpTitle" placeholder="Task Group title">
+                        <label for="grpTitle" class="form-label">Task Group Title</label>
+                        <input type="text" class="form-control" id="grpTitle" name="grpTitle"
+                            placeholder="Task Group title">
                     </div>
                     <div class="mb-3">
                         <label for="task" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="task" placeholder="Task title" required>
+                        {% if view %}
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Meeting title"
+                            value="{{taskDetails.title}}">
+                        {% else %}
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Meeting title"
+                            required>
+                        {% endif %}
                     </div>
+
+                    {% if tasks %}
+                    <div class="mb-2">
+                        <label for="meetRef" class="form-label">Task Reference</label>
+                        {% if view %}
+                        <div class="row align-items-center">
+                            <div class="col-md-10 col-sm-9 col-xl-10">
+                                <select class="form-select" id="taskRef" name="taskRef">
+                                    <option value="-1">
+                                        --- Select ---</option>
+                                    {% if taskDetails.refTask == 0 %}
+                                    <option value="0" selected>
+                                        Independent Task &check;</option>
+                                    {% else %}
+                                    <option value="0">
+                                        Independent Task</option>
+                                    {% endif %}
+                                    {% for task in tasks %}
+                                    {% if task.id == taskDetails.refTask %}
+                                    <option value="{{task.id}}" selected><span class="bg-primary">{{task.title}} on
+                                            {{task.date}} {{task.time}} &check;</span></option>
+                                    {% else %}
+                                    <option value="{{task.id}}">{{task.title}} on {{task.date}} {{task.time}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2 col-sm-3 col-xl-2">
+                                <a href="{% url 'Show-Event' %}?type={{eventTypes.Task}}&id={{taskDetails.refTask}}"
+                                    target="_blank" class="btn btn-primary btn-sm">Show</a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <select class="form-select" id="taskRef" name="taskRef">
+                            <option value="0">
+                                --- Select ---</option>
+                            {% for task in tasks %}
+                            <option value="{{task.id}}">{{task.title}} on {{task.date}} {{task.time}}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                     <div class="input-group mt-4">
                         <span class="input-group-text">Task Description</span>
+                        {% if view %}
+                        <textarea class="form-control" aria-label="With textarea" name="desc" rows="2"
+                            required>{{taskDetails.description}}</textarea>
+                        {% else %}
                         <textarea class="form-control" aria-label="With textarea" name="desc" rows="2"
                             required></textarea>
+                        {% endif %}
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                    {% if taskDetails.taskNotes == "" %}
+                    <div class="mt-3">
+                        <div id="commentBtn">
+                            <button type="button" onclick="toggleComment();"
+                                style="flex-direction: row; align-items: flex-end;" class="btn btn-primary btn-sm"><i
+                                    class="fa fa-plus"></i> New Comment</button>
+                        </div>
+                        <div id="commentCloseBtn" hidden>
+                            <button type="button" onclick="toggleComment();" class="btn btn-danger btn-close"></button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if taskDetails.taskNotes != "" %}
+                    <div class="form-floating mt-4">
+                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"
+                            name="taskNote">{{taskDetails.taskNotes}}</textarea>
+                        <label for="floatingTextarea">Comments</label>
+                    </div>
+                    {% endif %}
+
+                    {% if taskDetails.taskNotes == "" %}
+                    <div class="form-floating mt-4" id="comment" hidden>
+                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"
+                            name="taskNote"></textarea>
+                        <label for="floatingTextarea">Comments</label>
+                    </div>
+                    {% endif %}
+                    <hr>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a type="submit" class="btn btn-danger mt-3"
+                        href="{% url 'Event-Delete' %}?type={{eventTypes.Task}}&id={{taskDetails.id}}">Delete</a>
                 </form>
             </div>
         </div>
@@ -212,6 +352,7 @@
 {% block javascript %}
 <script>
     window.onload = toggleMeetType;
+    window.onload = toggleComment;
     function toggleMeetType() {
         if (document.getElementById("meetType").value == 1) {
             document.getElementById("url").hidden = false;
@@ -226,11 +367,23 @@
         }
     }
     function toggleTaskGroup() {
-        if (document.getElementById('taskGrp').value == 1) {
+        if (document.getElementById('taskGrp').value == 0) {
             document.getElementById('taskgrp').hidden = false;
         }
         else {
             document.getElementById('taskgrp').hidden = true;
+        }
+    }
+
+    function toggleComment() {
+        if (document.getElementById('comment').hidden) {
+            document.getElementById('comment').hidden = false;
+            document.getElementById('commentCloseBtn').hidden = false;
+            document.getElementById('commentBtn').hidden = true;
+        } else {
+            document.getElementById('comment').hidden = true;
+            document.getElementById('commentCloseBtn').hidden = true;
+            document.getElementById('commentBtn').hidden = false;
         }
     }
 </script>

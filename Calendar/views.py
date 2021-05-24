@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from .models import *
 import json
+import math
 
 
 with open('config.json', 'r') as file:
@@ -24,7 +25,74 @@ def home(request):
     context['subTitle'] = "Home"
     transformUrl(context['urls'])
     if 'user' in request.session:
-        context['meetings'] = Meeting.objects.filter(userid=int(request.session['user']))
+        meetCount = Meeting.objects.filter(userid=int(request.session['user'])).count()
+        taskCount = Task.objects.filter(userid=int(request.session['user'])).count()
+        recordsPerPage = int(context['metadata']['recordsPerPage'])
+        linksPerPage = int(context['metadata']['perpageLinks'])
+        if 'page' in request.GET:
+            context['currPage'] = int(request.GET['page'])
+            currPage = context['currPage']
+            if 'type' in request.GET:
+                if request.GET['type'] == context['eventTypes']['Meeting']:
+                    if currPage <= math.ceil(meetCount/recordsPerPage) and currPage > 0:
+                        if currPage >= math.ceil(linksPerPage/2) and currPage <= math.ceil(meetCount/recordsPerPage) - math.floor(linksPerPage/2):
+                            context['totalPagesMeeting'] = list(range(currPage-math.floor(linksPerPage/2), currPage+math.ceil(linksPerPage/2)))
+                        elif currPage < math.ceil(linksPerPage/2):
+                            context['totalPagesMeeting'] = list(range(1, math.ceil(meetCount/recordsPerPage) + 1))[:linksPerPage]
+                        else:
+                            context['totalPagesMeeting'] = list(range(1, math.ceil(meetCount/recordsPerPage) + 1))[-linksPerPage:]
+                    else:
+                        messages.warning(request, "Invalid Page Requested!")
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
+                    if currPage > 1:
+                        context['prevMeet'] = currPage - 1
+                    elif currPage > 0:
+                        context['prevMeet'] = '#'
+                    if currPage == math.ceil(meetCount/recordsPerPage):
+                        context['nextMeet'] = '#'
+                    else:
+                        context['nextMeet'] = currPage + 1
+                    context['meetings'] = Meeting.objects.filter(userid=int(request.session['user']))[(currPage-1)*recordsPerPage:(currPage*recordsPerPage)]
+                    context['currMeetPage'] = currPage
+                elif request.GET['type'] == context['eventTypes']['Task']:
+                    if currPage <= math.ceil(taskCount/recordsPerPage) and currPage > 0:
+                        if currPage >= math.ceil(linksPerPage/2) and currPage <= math.ceil(taskCount/recordsPerPage) - math.floor(linksPerPage/2):
+                            context['totalPagesTask'] = list(range(currPage-math.floor(linksPerPage/2), currPage+math.ceil(linksPerPage/2)))
+                        elif currPage < math.ceil(linksPerPage/2):
+                            context['totalPagesTask'] = list(range(1, math.ceil(taskCount/recordsPerPage) + 1))[:linksPerPage]
+                        else:
+                            context['totalPagesTask'] = list(range(1, math.ceil(taskCount/recordsPerPage) + 1))[-linksPerPage:]
+                    else:
+                        messages.warning(request, "Invalid Page Requested!")
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
+                    if currPage > 1:
+                        context['prevTask'] = currPage - 1
+                    elif currPage > 0:
+                        context['prevTask'] = '#'
+                    if currPage == math.ceil(taskCount / recordsPerPage):
+                        context['nextTask'] = '#'
+                    else:
+                        context['nextTask'] = currPage + 1
+                    context['tasks'] = Task.objects.filter(userid=int(request.session['user']))[(currPage-1)*recordsPerPage:(currPage*recordsPerPage)]
+                    context['currTaskPage'] = currPage
+        else:
+            context['totalPagesMeeting'] = list(range(1, math.ceil(meetCount/recordsPerPage) + 1))[:linksPerPage]
+            context['totalPagesTask'] = list(range(1, math.ceil(taskCount/recordsPerPage) + 1))[:linksPerPage]
+            context['tasks'] = Task.objects.filter(userid=int(request.session['user']))[:recordsPerPage]
+            context['meetings'] = Meeting.objects.filter(userid=int(request.session['user']))[:recordsPerPage]
+            context['prevMeet'] = '#'
+            context['prevTask'] = '#'
+            context['currPage'] = 1
+            context['currTaskPage'] = 1
+            context['currMeetPage'] = 1
+            if meetCount > recordsPerPage:
+                context['nextMeet'] = context['currPage'] + 1
+            else:
+                context['nextMeet'] = '#'
+            if taskCount > recordsPerPage:
+                context['nextTask'] = context['currPage'] + 1
+            else:
+                context['nextTask'] = '#'
         return render(request, f"{context['metadata']['alphaApp']}/index.html", context=context)
     else:
         return redirect(f"/{context['mappingUrls']['prefix']}{context['mappingUrls']['authenticate']}")
@@ -117,6 +185,15 @@ def deleteEvent(request):
                     else:
                         messages.warning(request, "Illegal Operation")
                         return redirect(f"/{context['mappingUrls']['prefix']}")
+                elif request.GET['type'] == context['eventTypes']['Task']:
+                    taskObj = Task.objects.filter(id=int(request.GET['id'])).first()
+                    if taskObj.userid == int(request.session['user']):
+                        Task.objects.filter(id=int(request.GET['id'])).first().delete()
+                        messages.success(request, f"Task deleted successfully!")
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
+                    else:
+                        messages.warning(request, "Illegal Operation")
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
             else:
                 messages.warning(request, "Important Parameter missing!")
                 return redirect(f"/{context['mappingUrls']['prefix']}")
@@ -151,7 +228,29 @@ def showEvent(request):
                 else:
                     return redirect(f"/{context['mappingUrls']['prefix']}")
             elif 'type' in request.GET and request.GET['type'] == context['eventTypes']['Task']:
-                pass
+                if 'id' in request.GET:
+                    context['allTasks'] = Task.objects.filter(userid=int(request.session['user']))
+                    flag = False
+                    context['tasks'] = list()
+                    context['taskGroupTitle'] = list()
+                    for task in context['allTasks']:
+                        if task.taskGroup not in context['taskGroupTitle'] and len(task.taskGroup) > 0:
+                            context['taskGroupTitle'].append(task.taskGroup)
+                        if task.id == int(request.GET['id']):
+                            flag = True
+                            context['taskDetails'] = task
+                        else:
+                            context['tasks'].append(task)
+                    if not flag:
+                        context['taskDetails'] = False
+                        messages.warning(request, "Requested Task not found!")
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
+                    context['task'] = True
+                    context['meeting'] = False
+                    context['view'] = True
+                    return render(request, f"{context['metadata']['alphaApp']}/showEvent.html", context=context)
+                else:
+                    return redirect(f"/{context['mappingUrls']['prefix']}")
     else:
         return redirect(f"/{context['mappingUrls']['prefix']}")
 
@@ -166,6 +265,7 @@ def add(request):
                 return render(request, f"{context['metadata']['alphaApp']}/addnew.html", context=context)
             else:
                 context['meeting'] = False
+                context['tasks'] = Task.objects.filter(userid=int(request.session['user']))
                 return render(request, f"{context['metadata']['alphaApp']}/addnew.html", context=context)
         else:
             return redirect(f"/{context['mappingUrls']['prefix']}")
@@ -208,6 +308,8 @@ def add(request):
                 meeting.time = time
                 meeting.description = desc
                 meeting.userid = int(request.session['user'])
+                if 'meetNote' in request.POST:
+                    meeting.meetingNotes = str(request.POST['meetNote']).strip()
                 if 'meetID' in request.POST:
                     if meeting.meetType == 'Virtual':
                         meeting.meetAddr = ''
@@ -221,7 +323,49 @@ def add(request):
                     messages.success(request, f"New meeting {meeting.title} added successfully!")
                     return redirect(f"/{context['mappingUrls']['prefix']}")
             elif request.POST['event'] == context['eventTypes']['Task']:
-                pass
-        else:
+                date = request.POST['date']
+                time = request.POST['time']
+                taskGrp = request.POST['taskGrp']
+                if taskGrp == '0':
+                    if 'grpTitle' in request.POST:
+                        grpTitle = str(request.POST['grpTitle']).strip()
+                elif taskGrp == '-1':
+                    grpTitle = ""
+                else:
+                    grpTitle = str(request.POST['taskGrp']).strip()
+                title = request.POST['title']
+                desc = request.POST['desc']
+                taskRef = 0
+                if 'taskRef' in request.POST:
+                    if int(request.POST['taskRef']) == 0:
+                        taskRef = 0
+                    elif int(request.POST['taskRef']) > 0:
+                        taskRef = int(request.POST['taskRef'])
+                if 'taskID' in request.POST:
+                    task = Task.objects.filter(id=int(request.POST['taskID'])).first()
+                    if task.userid != int(request.session['user']):
+                        messages.warning(request, "Illegal Operation!")
+                        return redirect(f"/{context['mappingUrls']['prefix']}")
+                else:
+                    task = Task()
+                task.time = time
+                task.date = date
+                task.title = title
+                task.taskGroup = grpTitle
+                task.description = desc
+                task.refTask = taskRef
+                task.userid = int(request.session['user'])
+                if 'taskNote' in request.POST:
+                    taskNote = str(request.POST['taskNote']).strip()
+                    task.taskNotes = taskNote
+                if 'taskID' in request.POST:
+                    task.save()
+                    messages.success(request, f"Task {task.title} updated successfully!")
+                    return redirect(f"/{context['mappingUrls']['prefix']}{context['mappingUrls']['show']}?type={context['eventTypes']['Task']}&id={task.id}")
+                else:
+                    task.save()
+                    messages.success(request, f"New task {task.title} added successfully!")
+                    return redirect(f"/{context['mappingUrls']['prefix']}")
+    else:
             messages.warning(request, "Invalid Operation!")
             return redirect(f"/{context['mappingUrls']['prefix']}")

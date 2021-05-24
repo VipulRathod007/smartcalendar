@@ -50,12 +50,12 @@
     </div>
     <hr>
     {% if meetings %}
-    <div class="container mt-3">
+    <div class="container my-3">
         <h2>{{eventTypes.Meeting}}</h2>
         <br>
-        <table class="table table-hover" id="upcoming">
+        <table class="table table-hover" id="{{eventTypes.Meeting}}">
             <thead>
-                <tr>
+                <tr class="bg-dark text-white">
                     <th scope="col">Meeting Time</th>
                     <th scope="col">Title</th>
                     <th scope="col">Actions</th>
@@ -64,22 +64,124 @@
             <tbody>
                 {% for meet in meetings %}
                 <tr>
-                    <td scope="row">{{meet.date}} {{meet.time}}</td>
-                    <td>{{meet.title}}</td>
+                    <td scope="row">
+                        <h6>{{meet.date}} {{meet.time}}</h6>
+                    </td>
+                    <td>
+                        <h6>{{meet.title}}</h6>
+                    </td>
                     <td>
                         <a href="{% url 'Show-Event' %}?type={{eventTypes.Meeting}}&id={{meet.id}}"
-                            class="btn bg-white"><i class="fa fa-eye"></i></a>
+                            class="btn bg-white btn-sm"><i class="fa fa-eye"></i></a>
                         <a href="{% url 'Event-Delete' %}?type={{eventTypes.Meeting}}&id={{meet.id}}"
-                            class="btn bg-danger"><i class="fa fa-trash text-white"></i></a>
+                            class="btn bg-danger btn-sm"><i class="fa fa-trash text-white"></i></a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        <div class="row align-items-center" style="font-size: smaller;">
+            <div class="col-md-2 col-sm-3">
+                {% if prevMeet == "#" %}
+                <a class="page-link  btn btn-sm mx-1 bg-dark text-white" href="#" tabindex="-1"
+                    aria-disabled="true">Previous</a>
+                {% else %}
+                <a class="page-link  btn btn-sm mx-1 bg-dark text-white"
+                    href="{% url 'App-Home' %}?type={{eventTypes.Meeting}}&page={{prevMeet}}" tabindex="-1"
+                    aria-disabled="true">Previous</a>
+                {% endif %}
+            </div>
+            <div class="col-md-8 col-sm-6">
+                <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center;">
+                    {% for i in totalPagesMeeting %}
+                    {% if i == currMeetPage %}
+                    <a class="page-link btn btn-sm mx-1 bg-dark text-white" href="#">{{i}}</a>
+                    {% else %}
+                    <a class="page-link btn btn-sm mx-1 btn-primary"
+                        href="{% url 'App-Home' %}?type={{eventTypes.Meeting}}&page={{i}}">{{i}}</a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-3">
+                {% if nextMeet == "#" %}
+
+                <a class="page-link btn-block btn btn-sm mx-1 bg-dark text-white" href="#">Next</a>
+                {% else %}
+                <a class="page-link  btn btn-sm mx-1 bg-dark text-white"
+                    href="{% url 'App-Home' %}?type={{eventTypes.Meeting}}&page={{nextMeet}}">Next</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
     {% else %}
-    <p class="text-center text-muted">No Events added yet!</p>
+    <p class="text-center text-muted">No Meetings added yet!</p>
     {% endif %}
+    <br>
+    <hr>
+    {% if tasks %}
+    <div class="container my-3">
+        <h2>{{eventTypes.Task}}</h2>
+        <br>
+        <table class="table table-hover" id="{{eventTypes.Task}}">
+            <thead>
+                <tr class="bg-dark text-white">
+                    <th scope="col">Deadline</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td scope="row"><h6>{{task.date}} {{task.time}}</h6></td>
+                    <td><h6>{{task.title}}</h6></td>
+                    <td>
+                        <a href="{% url 'Show-Event' %}?type={{eventTypes.Task}}&id={{task.id}}"
+                            class="btn btn-sm bg-white"><i class="fa fa-eye"></i></a>
+                        <a href="{% url 'Event-Delete' %}?type={{eventTypes.Task}}&id={{task.id}}"
+                            class="btn btn-sm bg-danger"><i class="fa fa-trash text-white"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="row align-items-center" style="font-size: smaller;">
+            <div class="col-md-2 col-sm-3">
+                {% if prevTask == "#" %}
+                <a class="page-link  btn btn-sm mx-1 bg-dark text-white" href="#" tabindex="-1"
+                    aria-disabled="true">Previous</a>
+                {% else %}
+                <a class="page-link  btn btn-sm mx-1 bg-dark text-white"
+                    href="{% url 'App-Home' %}?type={{eventTypes.Task}}&page={{prevTask}}" tabindex="-1"
+                    aria-disabled="true">Previous</a>
+                {% endif %}
+            </div>
+            <div class="col-md-8 col-sm-6">
+                <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center;">
+                    {% for i in totalPagesTask %}
+                    {% if i == currTaskPage %}
+                    <a class="page-link btn btn-sm mx-1 bg-dark text-white" href="#">{{i}}</a>
+                    {% else %}
+                    <a class="page-link btn btn-sm mx-1 btn-primary" href="{% url 'App-Home' %}?type={{eventTypes.Task}}&page={{i}}">{{i}}</a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-3">
+                {% if nextTask == "#" %}
+                <a class="page-link btn-block btn btn-sm mx-1 bg-dark text-white" href="#">Next</a>
+                {% else %}
+                <a class="page-link  btn btn-sm mx-1 bg-dark text-white"
+                    href="{% url 'App-Home' %}?type={{eventTypes.Task}}&page={{nextTask}}">Next</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-center text-muted">No Tasks added yet!</p>
+    {% endif %}
+    <br>
 </div>
 
 
@@ -87,6 +189,7 @@
 
 {% block javascript %}
 <script>
-    $('#upcoming').DataTable();
+    // $('#{{eventTypes.Meeting}}').DataTable();
+    // $('#{{eventTypes.Task}}').DataTable();
 </script>
 {% endblock javascript %}
