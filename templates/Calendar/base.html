@@ -73,7 +73,7 @@
         <div class="alert alert-{{message.tags}} alert-dismissible fade show row align-items-center" role="alert"
             style="margin: 0 auto; z-index:500000;">
             <div style="color: black;">
-                {{message}}
+                {{message|truncatechars:100}}
             </div>
             <button type="button" class="btn-close"
                 style="border: none; margin-left: 5px; margin-right: 0px; background-color: white;"

@@ -55,6 +55,7 @@
                         <label for="meetRef" class="form-label">Meeting Reference</label>
                         {% if view %}
                         <div class="row align-items-center">
+                            {% if meetingDetails.refMeet != 0 %}
                             <div class="col-md-10 col-sm-9 col-xl-10">
                                 <select class="form-select" id="meetRef" name="meetRef">
                                     <option value="-1">
@@ -76,10 +77,36 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                            {% else %}
+                            <div class="">
+                                <select class="form-select" id="meetRef" name="meetRef">
+                                    <option value="-1">
+                                        --- Select ---</option>
+                                    {% if meetingDetails.refMeet == 0 %}
+                                    <option value="0" selected>
+                                        Independent Meeting &check;</option>
+                                    {% else %}
+                                    <option value="0">
+                                        Independent Meeting</option>
+                                    {% endif %}
+                                    {% for meet in meetings %}
+                                    {% if meet.id == meetingDetails.refMeet %}
+                                    <option value="{{meet.id}}" selected><span class="bg-primary">{{meet.title}} on
+                                            {{meet.date}} {{meet.time}} &check;</span></option>
+                                    {% else %}
+                                    <option value="{{meet.id}}">{{meet.title}} on {{meet.date}} {{meet.time}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endif %}
+
+                            {% if meetingDetails.refMeet != 0 %}
                             <div class="col-md-2 col-sm-3 col-xl-2">
                                 <a href="{% url 'Show-Event' %}?type={{eventTypes.Meeting}}&id={{meetingDetails.refMeet}}"
                                     target="_blank" class="btn btn-primary btn-sm">Show</a>
                             </div>
+                            {% endif %}
                         </div>
                         {% else %}
                         <select class="form-select" id="meetRef" name="meetRef">
@@ -141,17 +168,17 @@
                         {% endif %}
                     </div>
 
-                    <div class="input-group mt-4">
-                        <span class="input-group-text">Description</span>
+                    <div class="form-floating mt-4">
                         {% if view %}
-                        <textarea class="form-control" aria-label="With textarea" name="desc" rows="2"
-                            required>{{meetingDetails.description}}</textarea>
+                        <textarea class="form-control" placeholder="Leave a comment here" id="desc" name="desc"
+                            rows="2">{{meetingDetails.description}}</textarea>
                         {% else %}
-                        <textarea class="form-control" aria-label="With textarea" name="desc" rows="2"
-                            required></textarea>
+                        <textarea class="form-control" placeholder="Leave a comment here" id="desc" name="desc"
+                            rows="2"></textarea>
                         {% endif %}
+                        <label for="desc">Description</label>
                     </div>
-
+                    
                     {% if meetingDetails.meetingNotes == "" %}
                     <div class="mt-3">
                         <div id="commentBtn">
@@ -232,11 +259,11 @@
                             {% endif %}
                             <option value="0">Add New</option>
                             {% for taskTitle in taskGroupTitle %}
-                                {% if taskDetails.taskGroup == taskTitle %}
-                                <option value="{{taskTitle}}" selected>{{taskTitle}} &check;</option>
-                                {% else %}
-                                <option value="{{taskTitle}}">{{taskTitle}}</option>
-                                {% endif %}
+                            {% if taskDetails.taskGroup == taskTitle %}
+                            <option value="{{taskTitle}}" selected>{{taskTitle}} &check;</option>
+                            {% else %}
+                            <option value="{{taskTitle}}">{{taskTitle}}</option>
+                            {% endif %}
                             {% endfor %}
                         </select>
                     </div>
@@ -261,7 +288,8 @@
                         <label for="meetRef" class="form-label">Task Reference</label>
                         {% if view %}
                         <div class="row align-items-center">
-                            <div class="col-md-10 col-sm-9 col-xl-10">
+                            {% if taskDetails.refTask != 0 %}
+                            <div class="col-md-10 col-sm-9 col-xl-10 mb-2">
                                 <select class="form-select" id="taskRef" name="taskRef">
                                     <option value="-1">
                                         --- Select ---</option>
@@ -282,9 +310,34 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                            {% else %}
+                            <div class="mb-2">
+                                <select class="form-select" id="taskRef" name="taskRef">
+                                    <option value="-1">
+                                        --- Select ---</option>
+                                    {% if taskDetails.refTask == 0 %}
+                                    <option value="0" selected>
+                                        Independent Task &check;</option>
+                                    {% else %}
+                                    <option value="0">
+                                        Independent Task</option>
+                                    {% endif %}
+                                    {% for task in tasks %}
+                                    {% if task.id == taskDetails.refTask %}
+                                    <option value="{{task.id}}" selected><span class="bg-primary">{{task.title}} on
+                                            {{task.date}} {{task.time}} &check;</span></option>
+                                    {% else %}
+                                    <option value="{{task.id}}">{{task.title}} on {{task.date}} {{task.time}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endif %}
                             <div class="col-md-2 col-sm-3 col-xl-2">
+                                {% if taskDetails.refTask != 0 %}
                                 <a href="{% url 'Show-Event' %}?type={{eventTypes.Task}}&id={{taskDetails.refTask}}"
                                     target="_blank" class="btn btn-primary btn-sm">Show</a>
+                                {% endif %}
                             </div>
                         </div>
                         {% else %}
@@ -298,15 +351,15 @@
                         {% endif %}
                     </div>
                     {% endif %}
-                    <div class="input-group mt-4">
-                        <span class="input-group-text">Task Description</span>
+                    <div class="form-floating mt-4">
                         {% if view %}
-                        <textarea class="form-control" aria-label="With textarea" name="desc" rows="2"
-                            required>{{taskDetails.description}}</textarea>
+                        <textarea class="form-control" placeholder="Leave a comment here" id="desc" name="desc"
+                            rows="2">{{taskDetails.description}}</textarea>
                         {% else %}
-                        <textarea class="form-control" aria-label="With textarea" name="desc" rows="2"
-                            required></textarea>
+                        <textarea class="form-control" placeholder="Leave a comment here" id="desc" name="desc"
+                            rows="2"></textarea>
                         {% endif %}
+                        <label for="desc">Task Description</label>
                     </div>
                     {% if taskDetails.taskNotes == "" %}
                     <div class="mt-3">

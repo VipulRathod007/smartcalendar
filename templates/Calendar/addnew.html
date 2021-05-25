@@ -105,8 +105,10 @@
                         <select class="form-select" id="taskGrp" name="taskGrp" required onchange="toggleTaskGroup();">
                             <option value="-1" selected>Independent</option>
                             <option value="0">Add New</option>
-                            {% for taskName in taskGroup %}
-                            <option value="{{taskName}}">{{taskName}}</option>
+                            {% for task in tasks %}
+                            {% if task.taskGroup != "" %}
+                            <option value="{{taskName}}">{{task.taskGroup}}</option>
+                            {% endif %}
                             {% endfor %}
                         </select>
                     </div>
