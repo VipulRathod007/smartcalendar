@@ -2,7 +2,7 @@
   "content": {
     "metadata": {
       "alphaApp": "Calendar",
-      "recordsPerPage": "4",
+      "recordsPerPage": "2",
       "perpageLinks": "5"
     },
     "urls": {

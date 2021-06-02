@@ -266,6 +266,7 @@ def add(request):
             else:
                 context['meeting'] = False
                 context['tasks'] = Task.objects.filter(userid=int(request.session['user']))
+                context['taskGroups'] = Task.objects.filter(userid=int(request.session['user'])).distinct('taskGroup').values_list('taskGroup', flat=True)
                 return render(request, f"{context['metadata']['alphaApp']}/addnew.html", context=context)
         else:
             return redirect(f"/{context['mappingUrls']['prefix']}")
